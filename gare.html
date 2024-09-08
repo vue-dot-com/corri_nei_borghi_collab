@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Race Submission Form</title>
+  </head>
+  <body>
+    <h1>Submit a New Race</h1>
+    <form id="raceForm">
+      <label for="location">Location:</label>
+      <input type="text" id="location" name="location" /><br />
+
+      <label for="name">Race Name:</label>
+      <input type="text" id="name" name="name" /><br />
+
+      <label for="date">Date:</label>
+      <input type="date" id="date" name="date" /><br />
+
+      <label for="logo">Logo URL:</label>
+      <input type="url" id="logo" name="logo" /><br />
+
+      <label for="description">Description:</label>
+      <textarea id="description" name="description"></textarea><br />
+
+      <h2>Programma</h2>
+      <label for="partenzaBaby">Partenza Baby:</label>
+      <input type="text" id="partenzaBaby" name="partenzaBaby" /><br />
+
+      <label for="partenzaNonCompetitiva">Partenza Non Competitiva:</label>
+      <input
+        type="text"
+        id="partenzaNonCompetitiva"
+        name="partenzaNonCompetitiva"
+      /><br />
+
+      <label for="partenzaCompetitivaM">Partenza Competitiva (Male):</label>
+      <input
+        type="text"
+        id="partenzaCompetitivaM"
+        name="partenzaCompetitivaM"
+      /><br />
+
+      <label for="partenzaCompetitivaF">Partenza Competitiva (Female):</label>
+      <input
+        type="text"
+        id="partenzaCompetitivaF"
+        name="partenzaCompetitivaF"
+      /><br />
+
+      <label for="ritrovo">Ritrovo:</label>
+      <input type="text" id="ritrovo" name="ritrovo" /><br />
+
+      <label for="parcheggi">Parcheggi:</label>
+      <input type="text" id="parcheggi" name="parcheggi" /><br />
+
+      <label for="docce">Docce:</label>
+      <input type="text" id="docce" name="docce" /><br />
+
+      <label for="ristoro">Ristoro:</label>
+      <input type="text" id="ristoro" name="ristoro" /><br />
+
+      <label for="altro">Altro:</label>
+      <input type="text" id="altro" name="altro" /><br />
+
+      <h2>Percorso</h2>
+      <label for="babyKm">Baby Km:</label>
+      <input type="number" step="0.01" id="babyKm" name="babyKm" /><br />
+
+      <label for="babyDislivello">Baby Dislivello:</label>
+      <input
+        type="number"
+        step="0.01"
+        id="babyDislivello"
+        name="babyDislivello"
+      /><br />
+
+      <label for="babyImg">Baby Img URL:</label>
+      <input type="url" id="babyImg" name="babyImg" /><br />
+
+      <label for="babyGpx">Baby GPX URL:</label>
+      <input type="url" id="babyGpx" name="babyGpx" /><br />
+
+      <label for="ncKm">Non Competitiva Km:</label>
+      <input type="number" step="0.01" id="ncKm" name="ncKm" /><br />
+
+      <label for="ncDislivello">Non Competitiva Dislivello:</label>
+      <input
+        type="number"
+        step="0.01"
+        id="ncDislivello"
+        name="ncDislivello"
+      /><br />
+
+      <label for="ncImg">Non Competitiva Img URL:</label>
+      <input type="url" id="ncImg" name="ncImg" /><br />
+
+      <label for="ncGpx">Non Competitiva GPX URL:</label>
+      <input type="url" id="ncGpx" name="ncGpx" /><br />
+
+      <label for="compKmM">Competitiva Male Km:</label>
+      <input type="number" step="0.01" id="compKmM" name="compKmM" /><br />
+
+      <label for="compDislivelloM">Competitiva Male Dislivello:</label>
+      <input
+        type="number"
+        step="0.01"
+        id="compDislivelloM"
+        name="compDislivelloM"
+      /><br />
+
+      <label for="compKmF">Competitiva Female Km:</label>
+      <input type="number" step="0.01" id="compKmF" name="compKmF" /><br />
+
+      <label for="compDislivelloF">Competitiva Female Dislivello:</label>
+      <input
+        type="number"
+        step="0.01"
+        id="compDislivelloF"
+        name="compDislivelloF"
+      /><br />
+
+      <label for="compImg">Competitiva Img URL:</label>
+      <input type="url" id="compImg" name="compImg" /><br />
+
+      <button type="submit">Submit Race</button>
+    </form>
+
+    <script>
+      document
+        .getElementById("raceForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const formData = new FormData(this);
+          const jsonData = Object.fromEntries(formData.entries());
+
+          fetch(
+            "https://api.github.com/repos/vue-dot-com/corri_nei_borghi_collab/dispatches",
+            {
+              method: "POST",
+              headers: {
+                Accept: "application/vnd.github.everest-preview+json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                event_type: "new_race_submission",
+                client_payload: jsonData,
+              }),
+            }
+          )
+            .then((response) => {
+              if (response.ok) {
+                alert("Form submitted successfully!");
+              } else {
+                alert("Error: " + response.statusText);
+              }
+            })
+            .catch((error) => {
+              alert("Error: " + error.message);
+            });
+        });
+    </script>
+  </body>
+</html>

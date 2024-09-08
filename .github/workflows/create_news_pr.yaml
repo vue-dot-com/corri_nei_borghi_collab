@@ -1,0 +1,46 @@
+name: Submit News
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo A
+        uses: actions/checkout@v3
+        with:
+          repository: user/repo-A
+          path: repo-A
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20"
+
+      - name: Add Race Info to Repo B
+        run: node ./path-to-js-file/updateConstants.js
+        env:
+          INPUT_TITLE: ${{ inputs.title }}
+          INPUT_TEXT: ${{ inputs.text }}
+          INPUT_IMG: ${{ inputs.image }}
+
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and Push Changes
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Add news entry"
+          git push origin main
+
+      - name: Create Pull Request to Repo B
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: main
+          pr_title: "New News Submission"
+          pr_body: "Race data submitted from GitHub Pages."
+          token: ${{ secrets.REPO_B_PAT }} # Use a repo secret for the token

@@ -1,0 +1,66 @@
+name: Submit Race Information
+on:
+  repository_dispatch:
+    types: [new_race_submission]
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo A
+        uses: actions/checkout@v3
+        with:
+          repository: user/repo-A
+          path: repo-A
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20"
+
+      - name: Add Race Info to Repo B
+        run: node ./src/javascript/update_gara.js
+        env:
+          INPUT_LOCATION: ${{ github.event.client_payload.location }}
+          INPUT_NAME: ${{ github.event.client_payload.name }}
+          INPUT_DATE: ${{ github.event.client_payload.date }}
+          INPUT_LOGO: ${{ github.event.client_payload.logo }}
+          INPUT_DESCRIPTION: ${{ github.event.client_payload.description }}
+          INPUT_IMGCOPERTINA: ${{ github.event.client_payload.imgCopertina }}
+          INPUT_PARTENZABABY: ${{ github.event.client_payload.partenzaBaby }}
+          INPUT_PARTENZANONCOMPETITIVA: ${{ github.event.client_payload.partenzaNonCompetitiva }}
+          INPUT_PARTENZACOMPETITIVAM: ${{ github.event.client_payload.partenzaCompetitivaM }}
+          INPUT_PARTENZACOMPETITIVAF: ${{ github.event.client_payload.partenzaCompetitivaF }}
+          INPUT_RITROVO: ${{ github.event.client_payload.ritrovo }}
+          INPUT_PARCHEGGI: ${{ github.event.client_payload.parcheggi }}
+          INPUT_DOCCE: ${{ github.event.client_payload.docce }}
+          INPUT_RISTORO: ${{ github.event.client_payload.ristoro }}
+          INPUT_ALTRO: ${{ github.event.client_payload.altro }}
+          INPUT_BABYKM: ${{ github.event.client_payload.babyKm }}
+          INPUT_BABYDISLIVELLO: ${{ github.event.client_payload.babyDislivello }}
+          INPUT_BABYIMG: ${{ github.event.client_payload.babyImg }}
+          INPUT_BABYGPX: ${{ github.event.client_payload.babyGpx }}
+          INPUT_NCKM: ${{ github.event.client_payload.ncKm }}
+          INPUT_NCDISLIVELLO: ${{ github.event.client_payload.ncDislivello }}
+          INPUT_NCIMG: ${{ github.event.client_payload.ncImg }}
+          INPUT_NCGPX: ${{ github.event.client_payload.ncGpx }}
+          INPUT_COMPKMM: ${{ github.event.client_payload.compKmM }}
+          INPUT_COMPDISLIVELLOM: ${{ github.event.client_payload.compDislivelloM }}
+          INPUT_COMPIMG: ${{ github.event.client_payload.compImg }}
+          INPUT_COMPKMF: ${{ github.event.client_payload.compKmF }}
+          INPUT_COMPDISLIVELLOF: ${{ github.event.client_payload.compDislivelloF }}
+
+      - name: Commit and Push Changes
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Add new race entry"
+          git push origin main
+
+      - name: Create Pull Request to Repo B
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: main
+          pr_title: "New Race Submission"
+          pr_body: "Race data submitted from GitHub Pages."
+          token: ${{ secrets.REPO_B_PAT }} # Use a repo secret for the token
